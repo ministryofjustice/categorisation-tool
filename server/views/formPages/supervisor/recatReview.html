@@ -92,32 +92,23 @@
 
     {% if not data.details.youngOffender%}
       {% set radios = radios | rejectattr('I') | rejectattr('J')%}
-    {% elif data.details.sentence.indeterminate %}
-      {% set radios = radios | rejectattr('D') | rejectattr('J')%}
     {% endif %}
 
     {% set overriddenCategoryTextHtml %}
-      {% if data.details.sentence.indeterminate and not data.details.youngOffender %}
-        {% set newCat = "C" if currentCat == "B" else "B" %}
-        <p class="govuk-body">Prisoner has indeterminate sentence - Cat D not available</p>
-        <h2 class="govuk-heading-m" id="newCatMessage">Changing to Cat {{ newCat }}</h2>
-        <input type="hidden" name="supervisorOverriddenCategory" value="{{ newCat }}" />
-      {% else %}
-          {{ govukRadios({
-            name: "supervisorOverriddenCategory",
-            classes: "govuk-radios--inline",
-            fieldset: {
-            legend: {
-            text: "Which category is more appropriate?",
-            isPageHeading: false
-          }
-          },
-          items: radios | rejectattr(currentCat),
-          errorMessage: {
-            text: "Please select the new category"
-            } if (errors | findError('supervisorOverriddenCategory'))
-          }) }}
-      {% endif %}
+        {{ govukRadios({
+          name: "supervisorOverriddenCategory",
+          classes: "govuk-radios--inline",
+          fieldset: {
+          legend: {
+          text: "Which category is more appropriate?",
+          isPageHeading: false
+        }
+        },
+        items: radios | rejectattr(currentCat),
+        errorMessage: {
+          text: "Please select the new category"
+          } if (errors | findError('supervisorOverriddenCategory'))
+        }) }}
 
       {{ govukCharacterCount({
         name: "supervisorOverriddenCategoryText",

@@ -264,42 +264,6 @@ class ProvisionalCategorySpecification extends GebReportingSpec {
     response.openConditionsRequested == null
   }
 
-  def 'indefinite sentence test for young offender'() {
-    db.createDataWithStatus(12, 'STARTED', JsonOutput.toJson([
-      ratings: TestFixture.defaultRatingsC]))
-
-    when: 'I go to the Provisional Category page'
-    elite2Api.stubUncategorised()
-    def date11 = LocalDate.now().plusDays(-3).toString()
-    def date12 = LocalDate.now().plusDays(-1).toString()
-    elite2Api.stubSentenceData(['B2345XY', 'B2345YZ'], [11, 12], [date11, date12])
-    fixture.loginAs(CATEGORISER_USER)
-    at CategoriserHomePage
-    elite2Api.stubGetOffenderDetails(12, 'B2345YZ', true, true)
-    to new ProvisionalCategoryPage(bookingId: '12'), '12'
-
-    then: 'The page is displayed correctly'
-    !appropriateNo.displayed
-    warning.text() == 'I\nWarning\nBased on the information provided, the provisional category is YOI Closed'
-    indeterminateMessage.text() == 'Prisoner has an indeterminate sentence - YOI Open not available'
-
-    when: 'form is submitted'
-    elite2Api.stubCategorise('I', '2019-12-14')
-    submitButton.click()
-
-    then: 'Data is stored correctly'
-    at CategoriserSubmittedPage
-
-    def data = db.getData(12)
-    data.status == ["AWAITING_APPROVAL"]
-    data.nomis_sequence_no == [4]
-    def response = new JsonSlurper().parseText(data.form_response[0].toString())
-    response.ratings == TestFixture.defaultRatingsC
-    response.supervisor == null
-    response.categoriser == [provisionalCategory: [suggestedCategory: 'I', categoryAppropriate: 'Yes']]
-    response.openConditionsRequested == null
-  }
-
   def 'Rollback on elite2Api failure'() {
     given: 'I am at the Provisional Category page'
     db.createDataWithStatus(12, 'STARTED', JsonOutput.toJson([

@@ -28,7 +28,6 @@ class SupervisorRecatReviewPage extends Page {
     overriddenCategoryText(required: false) { $('#supervisorOverriddenCategoryText') }
     otherInformationText { $('#otherInformationText') }
 
-    indeterminateMessage(required: false) { $('p.govuk-body') }
     errorSummaries(required: false) { $('ul.govuk-error-summary__list li') }
     errors(required: false) { $('span.govuk-error-message') }
     openConditionsHeader(required: false) { $('.openConditionsHeader') }

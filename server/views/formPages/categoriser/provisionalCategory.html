@@ -55,31 +55,25 @@
   }
 ] %}
 {% set overriddenCategoryTextHtml %}
-  {% if data.details.sentence.indeterminate %}
-    {% set newCat = "C" if cat == "B" else "B" %}
-    <p class="govuk-body">Prisoner has indeterminate sentence - Cat D not available</p>
-    <h2 class="govuk-heading-m">Changing to Cat {{ newCat }}</h2>
-    <input type="hidden" name="overriddenCategory" value="{{ newCat }}" />
+
+  {% if (cat == "B" or cat == "C" or cat == "D") %}
+    {{ govukRadios({
+      name: "overriddenCategory",
+      classes: "govuk-radios--inline",
+      fieldset: {
+        legend: {
+        text: "Which category is more appropriate?",
+        isPageHeading: false
+        }
+      },
+      items: radios | rejectattr(cat),
+      errorMessage: {
+        text: "Please select the new category"
+      } if (errors | findError('overriddenCategory'))
+    }) }}
   {% else %}
-    {% if (cat == "B" or cat == "C" or cat == "D") %}
-      {{ govukRadios({
-        name: "overriddenCategory",
-        classes: "govuk-radios--inline",
-        fieldset: {
-          legend: {
-          text: "Which category is more appropriate?",
-          isPageHeading: false
-          }
-        },
-        items: radios | rejectattr(cat),
-        errorMessage: {
-          text: "Please select the new category"
-        } if (errors | findError('overriddenCategory'))
-      }) }}
-    {% else %}
-      <h2 class="govuk-heading-m">Changing to YOI Open</h2>
-      <input type="hidden" name="overriddenCategory" value="J" />
-    {% endif %}
+    <h2 class="govuk-heading-m">Changing to YOI Open</h2>
+    <input type="hidden" name="overriddenCategory" value="J" />
   {% endif %}
 
   {{ govukCharacterCount({
@@ -115,10 +109,6 @@
 
 <input type="hidden" name="suggestedCategory" value="{{ cat }}" />
 
-{% if data.details.sentence.indeterminate and cat == "I" %}
-  <p class="govuk-body">Prisoner has an indeterminate sentence - YOI Open not available</p>
-  <input type="hidden" name="categoryAppropriate" value="Yes" />
-{% else %}
 {{ govukRadios({
   name: "categoryAppropriate",
   classes: "govuk-radios--inline",
@@ -147,7 +137,7 @@
     }
   ]
 }) }}
-{% endif %}
+
 
 {{ govukCharacterCount({
   name: "otherInformationText",

@@ -211,7 +211,7 @@ describe('recat', () => {
       })
   })
 
-  test('Category decision should not present open conditions options for indeterminate sentences)', () => {
+  test('Category decision should present open conditions options for indeterminate sentences)', () => {
     offendersService.getOffenderDetails.mockResolvedValue({
       sentence: { indeterminate: true },
     })
@@ -225,26 +225,7 @@ describe('recat', () => {
         expect(res.text).toContain('catCOption')
         expect(res.text).not.toContain('catIOption')
         expect(res.text).not.toContain('catJOption')
-        expect(res.text).not.toContain('catDOption')
-      })
-  })
-
-  test('Category decision should not present open conditions options for indeterminate sentences (young offender)', () => {
-    offendersService.getOffenderDetails.mockResolvedValue({
-      sentence: { indeterminate: true },
-    })
-    formService.isYoungOffender.mockReturnValue(true)
-    return request(app)
-      .get(`/decision/12345`)
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('catBOption')
-        expect(res.text).toContain('catCOption')
-        expect(res.text).toContain('catIOption')
-        expect(res.text).toContain('Prisoner has an indeterminate sentence')
-        expect(res.text).not.toContain('catJOption')
-        expect(res.text).not.toContain('catDOption')
+        expect(res.text).toContain('catDOption')
       })
   })
 

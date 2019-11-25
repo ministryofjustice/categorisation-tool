@@ -76,14 +76,8 @@
     label: { classes: "govuk-!-font-weight-bold" }
   } %}
 
-  {% if data.details.sentence.indeterminate %}
-    {{ govukInsetText({
-      text: "Prisoner has an indeterminate sentence, open conditions are not available."
-    }) }}
-    {% set itemList = [ optionB, optionC, optionI ] if data.details.youngOffender else [ optionB, optionC ] %}
-  {% else %}
-    {% set itemList = [ optionB, optionC, optionD, optionI, optionJ ] if data.details.youngOffender else [ optionB, optionC, optionD ] %}
-  {% endif %}
+   {% set itemList = [ optionB, optionC, optionD, optionI, optionJ ] if data.details.youngOffender else [ optionB, optionC, optionD ] %}
+
 
   {{ govukRadios({
     name: "category",

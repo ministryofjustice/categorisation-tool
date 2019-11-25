@@ -171,48 +171,6 @@ class SupervisorSpecification extends GebReportingSpec {
     offendingHistorySummary[2].text() == 'Yes\nsome convictions'
   }
 
-  def "The supervisor review page can be confirmed - indeterminate sentence"() {
-    given: 'supervisor is viewing the review page for B2345YZ'
-    db.createDataWithStatus(12, 'AWAITING_APPROVAL', JsonOutput.toJson([
-      ratings: TestFixture.defaultRatingsB,
-      categoriser: [provisionalCategory: [suggestedCategory: "C", categoryAppropriate: "Yes"]]]))
-    db.createNomisSeqNo(12,5)
-
-    navigateToReview(false, true)
-    !openConditionsHeader.isDisplayed()
-
-    when: 'the supervisor selects no'
-    elite2Api.stubSupervisorApprove("B")
-    appropriateNo.click()
-
-    then: 'The page shows info Changing to Cat'
-    warnings[0].text().contains 'the provisional category is C'
-    newCatMessage.text() == 'Changing to Cat B'
-    indeterminateMessage.text() == 'Prisoner has indeterminate sentence - Cat D not available'
-
-    when: 'Changing to Cat B'
-    overriddenCategoryText << "Some Text"
-    submitButton.click()
-
-    then: 'the review outcome page is displayed and review choices persisted'
-    at SupervisorReviewOutcomePage
-    userHeader.text().contains 'User, Test'
-
-
-    def data = db.getData(12)
-    data.status == ["APPROVED"]
-    def response = new JsonSlurper().parseText(data.form_response[0].toString())
-    response.ratings == TestFixture.defaultRatingsB
-    response.supervisor ==  [review: [proposedCategory: 'C', supervisorOverriddenCategory: 'B', supervisorCategoryAppropriate: 'No', supervisorOverriddenCategoryText: 'Some Text']]
-    response.categoriser == [provisionalCategory: [suggestedCategory: 'C', categoryAppropriate: 'Yes']]
-    response.openConditionsRequested == null
-
-    when: 'the supervisor clicks finish'
-    finishButton.click()
-
-    then: 'they return to the home page'
-    at SupervisorHomePage
-  }
 
   def "The supervisor can send the case back to the categoriser"() {
     given: 'supervisor is viewing the review page for B2345YZ'
@@ -357,33 +315,6 @@ class SupervisorSpecification extends GebReportingSpec {
     response.openConditionsRequested
   }
 
-  def "The supervisor review page can be confirmed - youth offender and indeterminate sentence"() {
-    when: 'supervisor is viewing the review page for B2345YZ'
-    db.createDataWithStatus(12, 'AWAITING_APPROVAL', JsonOutput.toJson([
-      ratings: TestFixture.defaultRatingsB,
-      categoriser: [provisionalCategory: [suggestedCategory: "I", categoryAppropriate: "Yes"]]]))
-    db.createNomisSeqNo(12,5)
-
-    navigateToReview(true, true)
-
-    then: 'the supervisor sees an info message'
-    elite2Api.stubSupervisorApprove('I')
-    indeterminateMessage.text() == 'Prisoner has an indeterminate sentence - YOI Open not available'
-
-    when: 'Approving'
-    submitButton.click()
-
-    then: 'the review outcome page is displayed and review choices persisted'
-    at SupervisorReviewOutcomePage
-
-    def data = db.getData(12)
-    data.status == ["APPROVED"]
-    def response = new JsonSlurper().parseText(data.form_response[0].toString())
-    response.ratings == TestFixture.defaultRatingsB
-    response.supervisor ==  [review: [proposedCategory: 'I', supervisorCategoryAppropriate: 'Yes']]
-    response.categoriser == [provisionalCategory: [suggestedCategory: 'I', categoryAppropriate: 'Yes']]
-    response.openConditionsRequested == null
-  }
 
   def "The supervisor review page validates input, suggested category B overridden with D"() {
     given: 'supervisor is viewing the review page for B2345YZ'

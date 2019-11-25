@@ -105,12 +105,6 @@
       }
     ] %}
     {% set overriddenCategoryTextHtml %}
-      {% if data.details.sentence.indeterminate %}
-        {% set newCat = "C" if currentCat == "B" else "B" %}
-        <p class="govuk-body">Prisoner has indeterminate sentence - Cat D not available</p>
-        <h2 class="govuk-heading-m" id="newCatMessage">Changing to Cat {{ newCat }}</h2>
-        <input type="hidden" name="supervisorOverriddenCategory" value="{{ newCat }}" />
-      {% else %}
         {% if (currentCat == "B" or currentCat == "C" or currentCat == "D") %}
           {{ govukRadios({
             name: "supervisorOverriddenCategory",
@@ -131,7 +125,6 @@
           <input type="hidden" name="supervisorOverriddenCategory" value="J"/>
           {{ warningCategoryOpenConditions | safe }}
         {% endif %}
-      {% endif %}
 
       {{ govukCharacterCount({
         name: "supervisorOverriddenCategoryText",
@@ -151,39 +144,34 @@
         }) }}
     {% endset %}
 
-    {% if data.details.sentence.indeterminate and currentCat == "I" %}
-      <p class="govuk-body">Prisoner has an indeterminate sentence - YOI Open not available</p>
-      <input type="hidden" name="supervisorCategoryAppropriate" value="Yes"/>
-    {% else %}
-      {{ govukRadios({
-        name: "supervisorCategoryAppropriate",
-        classes: "govuk-radios--inline",
-        fieldset: {
-          legend: {
-            text: "Do you agree with the provisional category?",
-            isPageHeading: false,
-            classes: "govuk-heading-m govuk-!-font-weight-bold"
-          },
-        classes: "govuk-!-margin-top-7"
+    {{ govukRadios({
+      name: "supervisorCategoryAppropriate",
+      classes: "govuk-radios--inline",
+      fieldset: {
+        legend: {
+          text: "Do you agree with the provisional category?",
+          isPageHeading: false,
+          classes: "govuk-heading-m govuk-!-font-weight-bold"
         },
-        errorMessage: {
-          text: "Select yes if you agree with the provisional category"
-        } if (errors | findError('supervisorCategoryAppropriate')),
-        items: [
-          {
-            value: "Yes",
-            text: "Yes"
-          },
-          {
-            value: "No",
-            text: "No",
-            conditional: {
-              html:overriddenCategoryTextHtml
-            }
+      classes: "govuk-!-margin-top-7"
+      },
+      errorMessage: {
+        text: "Select yes if you agree with the provisional category"
+      } if (errors | findError('supervisorCategoryAppropriate')),
+      items: [
+        {
+          value: "Yes",
+          text: "Yes"
+        },
+        {
+          value: "No",
+          text: "No",
+          conditional: {
+            html:overriddenCategoryTextHtml
           }
-        ]
-      }) }}
-    {% endif %}
+        }
+      ]
+    }) }}
 
   {{ govukCharacterCount({
     name: "otherInformationText",
